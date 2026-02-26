@@ -1,37 +1,33 @@
-import os
 import telebot
+import os
 from flask import Flask
-from threading import Thread
+import threading
 
 TOKEN = os.environ.get("BOT_TOKEN")
-
 bot = telebot.TeleBot(TOKEN)
+
 app = Flask(__name__)
 
-@app.route("/")
+@app.route('/')
 def home():
-    return "Bot online!"
+    return "Bot online"
+
+def run():
+    print("Bot iniciado...")
+    bot.infinity_polling()
 
 @bot.message_handler(func=lambda message: True)
 def gerar_link(message):
-    link_original = message.text
-    seu_codigo = "seucodigo123"
+    link = message.text
+    codigo = "seucodigo123"
 
-    if "amazon" in link_original:
-        link_afiliado = link_original + "?tag=" + seu_codigo
-        resposta = f"🔥 Seu link de afiliado:\n{link_afiliado}"
+    if link.startswith("http"):
+        link_afiliado = f"{link}?tag={codigo}"
+        bot.reply_to(message, f"🔥 Link afiliado:\n{link_afiliado}")
     else:
-        resposta = "Envie um link válido."
-
-    bot.reply_to(message, resposta)
-
-
-def iniciar_bot():
-    bot.infinity_polling(timeout=10, long_polling_timeout=5)
-
+        bot.reply_to(message, "Envie um link válido.")
 
 if __name__ == "__main__":
-    Thread(target=iniciar_bot).start()
-
+    threading.Thread(target=run).start()
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, threaded=True)
+    app.run(host="0.0.0.0", port=port)
