@@ -13,19 +13,23 @@ def home():
     return "Bot online"
 
 def run():
-    print("Bot iniciado...")
+    print("Bot iniciado com sucesso!")
     bot.infinity_polling()
 
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(content_types=['text'])
 def gerar_link(message):
-    link = message.text
+    link = message.text.strip()
     codigo = "seucodigo123"
 
-    if link.startswith("http"):
+    print("Mensagem recebida:", link)
+
+    if "http" in link:
         link_afiliado = f"{link}?tag={codigo}"
-        bot.reply_to(message, f"🔥 Link afiliado:\n{link_afiliado}")
+        resposta = f"🔥 Seu link afiliado:\n{link_afiliado}"
     else:
-        bot.reply_to(message, "Envie um link válido.")
+        resposta = "Envie um link começando com http ou https."
+
+    bot.reply_to(message, resposta)
 
 if __name__ == "__main__":
     threading.Thread(target=run).start()
